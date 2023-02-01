@@ -1,0 +1,150 @@
+<html lang="en">
+
+<head>
+    <title>Soil water sensors</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        html,
+        body,
+        h1,
+        h2,
+        h3,
+        h4,
+        h5 {
+            font-family: "Raleway", sans-serif
+        }
+    </style>
+</head>
+
+<body style="margin:20;padding:0">
+    <h1>Soil water sensors</h1>
+    <form action="#" id="data-input" onsubmit="get_data();">
+        <label for="sensor-select">Sensor</label>
+        <select id="sensor-select">
+            <option value="">--Select a sensor--</option>
+            <option value="power1">Data logger 1 power</option>
+            <option value="power2">Data logger 2 power</option>
+            <option value="water_content01">Water content 1</option>
+            <option value="water_content02">Water content 2</option>
+            <option value="water_content03">Water content 3</option>
+            <option value="water_content04">Water content 4</option>
+            <option value="water_content05">Water content 5</option>
+            <option value="water_content06">Water content 6</option>
+            <option value="water_content07">Water content 7</option>
+            <option value="water_content08">Water content 8</option>
+            <option value="water_content09">Water content 9</option>
+            <option value="water_content10">Water content 10</option>
+            <option value="water_content11">Water content 11</option>
+            <option value="water_content12">Water content 12</option>
+            <option value="water_content13">Water content 13</option>
+            <option value="water_content14">Water content 14</option>
+            <option value="water_content15">Water content 15</option>
+            <option value="water_content16">Water content 16</option>
+            <option value="water_content17">Water content 17</option>
+            <option value="water_content18">Water content 18</option>
+            <option value="water_content19">Water content 19</option>
+            <option value="water_content20">Water content 20</option>
+        </select>
+        <br>
+        <br>
+
+
+        <!-- <label for="start-date">Start date:</label>
+    <input type="datetime-local" id="start-date" value="">
+    <br> -->
+        <label for="end-date">End date:</label>
+        <select id="start-or-end">
+            <option value="end">End date</option>
+            <option value="start">Start date</option>
+        </select>
+        <input type="datetime-local" id="datetime" value="">
+        <br>
+        <br>
+        Duration:
+        <input type="number" min="0" max="30" value="7" id="time-days" size="2"> days,
+        <input type="number" min="0" max="59" value="0" id="time-hours" size="2"> hours,
+        <input type="number" min="0" max="59" value="0" id="time-minutes" size="2"> minutes
+        <br>
+        <br>
+        <input type="submit">
+    </form>
+
+    <div class="chart-container" style="position: relative; height:60vh; width:80vw">
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const host = window.location.origin;
+        console.log(host);
+        const SERVER_URL = origin + "/greenroof/soil/";
+        function set_date(id) {
+            el = document.getElementById(id);
+            const url = origin + "/greenroof/latest-date/soil";
+            fetch(url).then((response) => response.json())
+                .then((text) => {
+                    console.log(text);
+                    el.valueAsDate = new Date(Date.parse(text));
+                })
+        }
+        set_date("datetime");
+        const ctx = document.getElementById('myChart')
+        var chart = new Chart(ctx, {});
+        function get_data() {
+            const sensor = document.getElementById("sensor-select").value;
+            const datetime = document.getElementById("datetime").valueAsDate.toISOString();
+            const days = document.getElementById("time-days").value;
+            const hours = document.getElementById("time-hours").value;
+            const minutes = document.getElementById("time-minutes").value;
+            const seconds = 60 * (minutes + 60 * (hours + 24 * days));
+
+            const which_time = document.getElementById("start-or-end").value + "_time"
+            const url = SERVER_URL + sensor + "?" + new URLSearchParams(
+                {
+                    [which_time]: datetime,
+                    "duration": seconds,
+                }
+            );
+            fetch(url)
+                .then((response) => response.json())
+                .then(
+                    (data) => {
+                        chart.destroy();
+
+                        chart = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                datasets: [{
+                                    data: data[sensor],
+                                    label: sensor,
+                                    pointRadius: 0,
+                                    borderWidth: 1
+                                }],
+                                labels: data["datetimes"],
+                            },
+                            options: {
+                                xAxes: [{
+                                    type: 'time',
+                                    distribution: 'linear',
+                                    responsive: true,
+                                    maintainAspectRatio: true,
+                                }]
+                            }
+                        });
+                    });
+
+
+        }
+
+
+    </script>
+
+
+</body>
+
+</html>
