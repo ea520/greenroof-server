@@ -7,7 +7,7 @@ from .database import Base
 class Weather(Base):
     __tablename__ = "weather"
     # id = Column(Integer, primary_key=True, index=True)
-    datetime = Column(DateTime,primary_key=True, index=True)
+    datetime = Column(DateTime, primary_key=True, index=True)
     power = Column(Float)
     pressure = Column(Float)
     rain = Column(Float)
@@ -31,34 +31,33 @@ class Weather(Base):
     daily_total_evapotranspiration = Column(Float)
 
 
-class WaterLevel1(Base):
-    __tablename__ = "waterlevel1"
-    # id = Column(Integer, primary_key=True, index=True)
-    datetime = Column(DateTime,primary_key=True, index=True)
+class SoilMoisture1(Base):
+    __tablename__ = "soil_moisture1"
+    datetime = Column(DateTime, primary_key=True, index=True)
     power1 = Column(Float)
-    water_content01 = Column(Float)
-    water_content02 = Column(Float)
-    water_content03 = Column(Float)
-    water_content04 = Column(Float)
-    water_content05 = Column(Float)
-    water_content06 = Column(Float)
-    water_content07 = Column(Float)
-    water_content08 = Column(Float)
-    water_content09 = Column(Float)
-    water_content10 = Column(Float)
+    soil_moisture01 = Column(Float)
+    soil_moisture02 = Column(Float)
+    soil_moisture03 = Column(Float)
+    soil_moisture04 = Column(Float)
+    soil_moisture05 = Column(Float)
+    soil_moisture06 = Column(Float)
+    soil_moisture07 = Column(Float)
+    soil_moisture08 = Column(Float)
+    soil_moisture09 = Column(Float)
+    soil_moisture10 = Column(Float)
 
-class WaterLevel2(Base):
-    __tablename__ = "waterlevel2"
-    # id = Column(Integer, primary_key=True, index=True)
-    datetime = Column(DateTime,primary_key=True, index=True)
+
+class SoilMoisture2(Base):
+    __tablename__ = "soil_moisture2"
+    datetime = Column(DateTime, primary_key=True, index=True)
     power2 = Column(Float)
-    water_content11 = Column(Float)
-    water_content12 = Column(Float)
-    water_content13 = Column(Float)
-    water_content14 = Column(Float)
-    water_content15 = Column(Float)
-    water_content16 = Column(Float)
-    water_content17 = Column(Float)
-    water_content18 = Column(Float)
-    water_content19 = Column(Float)
-    water_content20 = Column(Float)
+    soil_moisture11 = Column(Float)
+    soil_moisture12 = Column(Float)
+    soil_moisture13 = Column(Float)
+    soil_moisture14 = Column(Float)
+    soil_moisture15 = Column(Float)
+    soil_moisture16 = Column(Float)
+    soil_moisture17 = Column(Float)
+    soil_moisture18 = Column(Float)
+    soil_moisture19 = Column(Float)
+    soil_moisture20 = Column(Float)

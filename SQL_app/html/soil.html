@@ -1,103 +1,160 @@
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <title>Soil water sensors</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css"
+        integrity="sha512-aEe/ZxePawj0+G2R+AaIxgrQuKT68I28qh+wgLrcAJOz3rxCP+TwrK5SPN+E5I+1IQjNtcfvb96HDagwrKRdBw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"
+        integrity="sha512-GDey37RZAxFkpFeJorEUwNoIbkTwsyC736KNSYucu1WJWFK9qTdzYub8ATxktr6Dwke7nbFaioypzbDOQykoRg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        html,
-        body,
-        h1,
-        h2,
-        h3,
-        h4,
-        h5 {
-            font-family: "Raleway", sans-serif
+        select:required:invalid {
+            color: gray;
+        }
+
+        option[value=""][disabled] {
+            display: none;
+        }
+
+        option {
+            color: black;
         }
     </style>
 </head>
 
-<body style="margin:20;padding:0">
-    <h1>Soil water sensors</h1>
-    <form action="#" id="data-input" onsubmit="get_data();">
-        <label for="sensor-select">Sensor</label>
-        <select id="sensor-select">
-            <option value="">--Select a sensor--</option>
-            <option value="power1">Data logger 1 power</option>
-            <option value="power2">Data logger 2 power</option>
-            <option value="water_content01">Water content 1</option>
-            <option value="water_content02">Water content 2</option>
-            <option value="water_content03">Water content 3</option>
-            <option value="water_content04">Water content 4</option>
-            <option value="water_content05">Water content 5</option>
-            <option value="water_content06">Water content 6</option>
-            <option value="water_content07">Water content 7</option>
-            <option value="water_content08">Water content 8</option>
-            <option value="water_content09">Water content 9</option>
-            <option value="water_content10">Water content 10</option>
-            <option value="water_content11">Water content 11</option>
-            <option value="water_content12">Water content 12</option>
-            <option value="water_content13">Water content 13</option>
-            <option value="water_content14">Water content 14</option>
-            <option value="water_content15">Water content 15</option>
-            <option value="water_content16">Water content 16</option>
-            <option value="water_content17">Water content 17</option>
-            <option value="water_content18">Water content 18</option>
-            <option value="water_content19">Water content 19</option>
-            <option value="water_content20">Water content 20</option>
-        </select>
-        <br>
-        <br>
+<body style="margin:0px;padding:10px;">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="index.html">Green roof sensors</a>
+            </div>
+            <ul class="nav navbar-nav">
+                <li><a href=weather.html>Weather</a></li>
+                <li class="active"><a href="soil.html">Soil moisture</a></li>
+                <li><a href="#">Temperature</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container">
 
+        <div class="row">
+            <div class="col-sm-10 col-md-4 col-xs-10 col-lg-4">
+                <select class="form-control" id="sensor-select">
+                    <option value="" disabled selected>Sensor</option>
+                    <option value="power1">Data logger 1 power</option>
+                    <option value="power2">Data logger 2 power</option>
+                    <option value="soil_moisture01">Soil moisture 1</option>
+                    <option value="soil_moisture02">Soil moisture 2</option>
+                    <option value="soil_moisture03">Soil moisture 3</option>
+                    <option value="soil_moisture04">Soil moisture 4</option>
+                    <option value="soil_moisture05">Soil moisture 5</option>
+                    <option value="soil_moisture06">Soil moisture 6</option>
+                    <option value="soil_moisture07">Soil moisture 7</option>
+                    <option value="soil_moisture08">Soil moisture 8</option>
+                    <option value="soil_moisture09">Soil moisture 9</option>
+                    <option value="soil_moisture10">Soil moisture 10</option>
+                    <option value="soil_moisture11">Soil moisture 11</option>
+                    <option value="soil_moisture12">Soil moisture 12</option>
+                    <option value="soil_moisture13">Soil moisture 13</option>
+                    <option value="soil_moisture14">Soil moisture 14</option>
+                    <option value="soil_moisture15">Soil moisture 15</option>
+                    <option value="soil_moisture16">Soil moisture 16</option>
+                    <option value="soil_moisture17">Soil moisture 17</option>
+                    <option value="soil_moisture18">Soil moisture 18</option>
+                    <option value="soil_moisture19">Soil moisture 19</option>
+                    <option value="soil_moisture20">Soil moisture 20</option>
+                </select>
+            </div>
+        </div>
 
-        <!-- <label for="start-date">Start date:</label>
-    <input type="datetime-local" id="start-date" value="">
-    <br> -->
-        <label for="end-date">End date:</label>
-        <select id="start-or-end">
-            <option value="end">End date</option>
-            <option value="start">Start date</option>
-        </select>
-        <input type="datetime-local" id="datetime" value="">
         <br>
-        <br>
-        Duration:
-        <input type="number" min="0" max="30" value="7" id="time-days" size="2"> days,
-        <input type="number" min="0" max="59" value="0" id="time-hours" size="2"> hours,
-        <input type="number" min="0" max="59" value="0" id="time-minutes" size="2"> minutes
-        <br>
-        <br>
-        <input type="submit">
-    </form>
+        <div class="row">
+            <div class="col-sm-3 col-md-4 col-xs-6 col-lg-4">
+                <select class="form-control" id="start-or-end">
+                    <option value="end">End date</option>
+                    <option value="start">Start date</option>
+                </select>
+            </div>
 
-    <div class="chart-container" style="position: relative; height:60vh; width:80vw">
-        <canvas id="myChart"></canvas>
+            <div class='col-sm-3'>
+                <div class="form-group">
+                    <div class='input-group date' id='datetimepicker1'>
+                        <input type='text' class="form-control" />
+                        <span class="input-group-addon">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-sm-2 col-md-1 col-xs-3 col-lg-1" style="padding: 5px;">
+                <h4>
+                    Duration:
+                </h4>
+            </div>
+
+            <div class="col-sm-2 col-md-1 col-xs-3 col-lg-1" style="padding: 5px;">
+                <input class="form-control" type="number" min="0" max="365" id="time-days" placeholder="Days">
+            </div>
+            <div class="col-sm-2 col-md-1 col-xs-3 col-lg-1" style="padding: 5px;">
+                <input class="form-control" type="number" min="0" max="59" id="time-hours" placeholder="Hours">
+            </div>
+
+            <div class="col-sm-2 col-md-1 col-xs-3 col-lg-1" style="padding: 5px;">
+                <input class="form-control" type="number" min="0" max="59" id="time-minutes" placeholder="Mins">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-1 col-md-1 col-xs-3 col-lg-1" style="padding: 5px;">
+                <button type="button" class="btn btn-default" onclick="get_data();">Plot</button>
+            </div>
+            <div class="col-sm-1 col-md-1 col-xs-3 col-lg-1" style="padding: 5px;">
+                <button type="button" class="btn btn-default" onclick="export_data();">Export</button>
+            </div>
+        </div>
+        <div class="chart-container" style="position: relative; height:60vh; width:80vw">
+            <canvas id="myChart"></canvas>
+        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <script>
+
+
+    <script type="text/javascript">
         const host = window.location.origin;
         console.log(host);
         const SERVER_URL = origin + "/greenroof/soil/";
-        function set_date(id) {
-            el = document.getElementById(id);
+        function set_date() {
             const url = origin + "/greenroof/latest-date/soil";
             fetch(url).then((response) => response.json())
                 .then((text) => {
                     console.log(text);
-                    el.valueAsDate = new Date(Date.parse(text));
+                    $('#datetimepicker1').data("DateTimePicker").date(new Date(text));
                 })
         }
-        set_date("datetime");
+        set_date();
         const ctx = document.getElementById('myChart')
         var chart = new Chart(ctx, {});
         function get_data() {
             const sensor = document.getElementById("sensor-select").value;
-            const datetime = document.getElementById("datetime").valueAsDate.toISOString();
+            const datetime = $('#datetimepicker1').data("DateTimePicker").date();
             const days = document.getElementById("time-days").value;
             const hours = document.getElementById("time-hours").value;
             const minutes = document.getElementById("time-minutes").value;
@@ -106,8 +163,9 @@
             const which_time = document.getElementById("start-or-end").value + "_time"
             const url = SERVER_URL + sensor + "?" + new URLSearchParams(
                 {
-                    [which_time]: datetime,
+                    [which_time]: datetime.toISOString(),
                     "duration": seconds,
+                    "nvals": 1080,
                 }
             );
             fetch(url)
@@ -115,7 +173,6 @@
                 .then(
                     (data) => {
                         chart.destroy();
-
                         chart = new Chart(ctx, {
                             type: 'line',
                             data: {
@@ -128,12 +185,24 @@
                                 labels: data["datetimes"],
                             },
                             options: {
+                                scales: {
+                                    x: {
+                                        ticks: {
+                                            maxTicksLimit: 10
+                                        }
+                                    }
+                                },
+                                responsive: true,
+                                maintainAspectRatio: true,
                                 xAxes: [{
                                     type: 'time',
                                     distribution: 'linear',
-                                    responsive: true,
-                                    maintainAspectRatio: true,
-                                }]
+                                }],
+                                plugins: {
+                                    decimation: {
+                                        enabled: true,
+                                    }
+                                }
                             }
                         });
                     });
@@ -141,7 +210,27 @@
 
         }
 
+        function export_data() {
+            const sensor = document.getElementById("sensor-select").value;
+            const datetime = $('#datetimepicker1').data("DateTimePicker").date();
+            const days = document.getElementById("time-days").value;
+            const hours = document.getElementById("time-hours").value;
+            const minutes = document.getElementById("time-minutes").value;
+            const seconds = 60 * (minutes + 60 * (hours + 24 * days));
 
+            const which_time = document.getElementById("start-or-end").value + "_time"
+            const url = SERVER_URL + sensor + "/csv" + "?" + new URLSearchParams(
+                {
+                    [which_time]: datetime.toISOString(),
+                    "duration": seconds,
+                }
+            );
+            console.log(url);
+            window.open(url, '_blank');
+        }
+        $(function () {
+            $('#datetimepicker1').datetimepicker();
+        });
     </script>
 
 

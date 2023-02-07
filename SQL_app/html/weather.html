@@ -1,54 +1,95 @@
 <html lang="en">
 
 <head>
+    
     <title>Green roof weather sensors</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <style>
-        html,
-        body,
-        h1,
-        h2,
-        h3,
-        h4,
-        h5 {
-            font-family: "Raleway", sans-serif
-        }
+    .scrollable-menu {
+        height: auto;
+        max-height: 200px;
+        overflow-x: hidden;
+    }
     </style>
 </head>
 
+
+
 <body style="margin:20;padding:0">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="index.html">Green roof sensors</a>
+          </div>
+          <ul class="nav navbar-nav">
+            <li><a href=weather.html>Weather</a></li>
+            <li><a href="soil.html">Soil moisture</a></li>
+            <li><a href="#">Temperature</a></li>
+          </ul>
+        </div>
+    </nav>
     <h1>Green roof weather sensors</h1>
-    <form action="#" id="data-input" onsubmit="get_data();">
+    <form action="#"></form>
+    
+    <div class="dropdown">
+        <button class="btn btn-default scrollable-menu dropdown-toggle " type="button" id="menu1" data-toggle="dropdown">Select a sensor
+        <span class="caret"></span></button>
+        <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+          <li role="presentation" value="pressure">pressure</li>
+          <li role="presentation" value="power">power</li>
+          <li role="presentation" value="rain">rain</li>
+          <li role="presentation" value="wind_dir">wind direction</li>
+          <li role="presentation" value="wind_speed">wind speed</li>
+          <li role="presentation" value="average_humidity">average humidity</li>
+          <li role="presentation" value="max_humidity">max humidity</li>
+          <li role="presentation" value="min_humidity">min humidity</li>
+          <li role="presentation" value="average_temp">average temp</li>
+          <li role="presentation" value="max_temp">max temp</li>
+          <li role="presentation" value="min_temp">min temp</li>
+          <li role="presentation" value="average_total_radiation">average total radiation</li>
+          <li role="presentation" value="max_total_radiation">max total radiation</li>
+          <li role="presentation" value="min_total_radiation">min total radiation</li>
+          <li role="presentation" value="average_diffuse_radiation">average diffuse radiation</li>
+          <li role="presentation" value="max_diffuse_radiation">max diffuse radiation</li>
+          <li role="presentation" value="min_diffuse_radiation">min diffuse radiation</li>
+          <li role="presentation" value="evapotranspiration">evapotranspiration</li>
+          <li role="presentation" value="daily_cumulative_evapotranspiration">daily cumulative evapotranspiration</li>
+          <li role="presentation" value="daily_total_evapotranspiration">daily total evapotranspiration</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- <form action="#" id="data-input" onsubmit="get_data();">
         <label for="sensor-select">Sensor</label>
         <select id="sensor-select">
             <option value="">--Select a sensor--</option>
-            <option value="pressure">pressure</option>
-            <option value="power">power</option>
-            <option value="rain">rain</option>
-            <!-- <option value="sunshine">sunshine</option> -->
-            <option value="wind_dir">wind direction</option>
-            <option value="wind_speed">wind speed</option>
-            <option value="average_humidity">average humidity</option>
-            <option value="max_humidity">max humidity</option>
-            <option value="min_humidity">min humidity</option>
-            <option value="average_temp">average temp</option>
-            <option value="max_temp">max temp</option>
-            <option value="min_temp">min temp</option>
-            <option value="average_total_radiation">average total radiation</option>
-            <option value="max_total_radiation">max total radiation</option>
-            <option value="min_total_radiation">min total radiation</option>
-            <option value="average_diffuse_radiation">average diffuse radiation</option>
-            <option value="max_diffuse_radiation">max diffuse radiation</option>
-            <option value="min_diffuse_radiation">min diffuse radiation</option>
-            <option value="evapotranspiration">evapotranspiration</option>
-            <option value="daily_cumulative_evapotranspiration">daily cumulative evapotranspiration</option>
-            <option value="daily_total_evapotranspiration">daily total evapotranspiration</option>
+             <option value="sunshine">sunshine</option> 
+            <option value="pressure">                               pressure</option>                                   
+            <option value="power">                                  power</option>                                                              
+            <option value="rain">                                   rain</option>                                               
+        <option value="wind_dir">                                   wind direction</option>                                                                 
+            <option value="wind_speed">                             wind speed</option>                                                 
+            <option value="average_humidity">                       average humidity</option>                                       
+            <option value="max_humidity">                           max humidity</option>                                                       
+            <option value="min_humidity">                           min humidity</option>                                           
+            <option value="average_temp">                           average temp</option>                                       
+            <option value="max_temp">                               max temp</option>                                                                           
+            <option value="min_temp">                               min temp</option>                                                       
+            <option value="average_total_radiation">                average total radiation</option>                                                    
+            <option value="max_total_radiation">                    max total radiation</option>                                                    
+            <option value="min_total_radiation">                    min total radiation</option>                                        
+            <option value="average_diffuse_radiation">              average diffuse radiation</option>                                                      
+            <option value="max_diffuse_radiation">                  max diffuse radiation</option>                                          
+            <option value="min_diffuse_radiation">                  min diffuse radiation</option>                                                  
+            <option value="evapotranspiration">                     evapotranspiration</option>                                         
+            <option value="daily_cumulative_evapotranspiration">    daily cumulative evapotranspiration</option>                                            
+            <option value="daily_total_evapotranspiration">         daily total evapotranspiration</option>                                                 
 
-        </select>
+        </select> -->
         <br>
         <br>
 

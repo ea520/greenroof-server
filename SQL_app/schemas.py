@@ -37,46 +37,49 @@ class Weather(WeatherBase):
         orm_mode = True
 
 
-
-class WaterLevel1Base(BaseModel):
+class SoilMoisture1Base(BaseModel):
     datetime: datetime.datetime
     power1: float
-    water_content01: float
-    water_content02: float
-    water_content03: float
-    water_content04: float
-    water_content05: float
-    water_content06: float
-    water_content07: float
-    water_content08: float
-    water_content09: float
-    water_content10: float
+    soil_moisture01: float
+    soil_moisture02: float
+    soil_moisture03: float
+    soil_moisture04: float
+    soil_moisture05: float
+    soil_moisture06: float
+    soil_moisture07: float
+    soil_moisture08: float
+    soil_moisture09: float
+    soil_moisture10: float
 
-class WaterLevel1Create(WaterLevel1Base):
+
+class SoilMoisture1Create(SoilMoisture1Base):
     pass
 
-class WaterLevel1(WaterLevel1Base):
+
+class SoilMoisture1(SoilMoisture1Base):
     class Config:
         orm_mode = True
 
 
-class WaterLevel2Base(BaseModel):
+class SoilMoisture2Base(BaseModel):
     datetime: datetime.datetime
     power2: float
-    water_content11: float
-    water_content12: float
-    water_content13: float
-    water_content14: float
-    water_content15: float
-    water_content16: float
-    water_content17: float
-    water_content18: float
-    water_content19: float
-    water_content20: float
+    soil_moisture11: float
+    soil_moisture12: float
+    soil_moisture13: float
+    soil_moisture14: float
+    soil_moisture15: float
+    soil_moisture16: float
+    soil_moisture17: float
+    soil_moisture18: float
+    soil_moisture19: float
+    soil_moisture20: float
 
-class WaterLevel2Create(WaterLevel2Base):
+
+class SoilMoisture2Create(SoilMoisture2Base):
     pass
 
-class WaterLevel2(WaterLevel2Base):
+
+class SoilMoisture2(SoilMoisture2Base):
     class Config:
         orm_mode = True
