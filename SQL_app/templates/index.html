@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Green roof web interface</h1>
+    <div id="accordion">
+
+        <div class="card">
+            <div class="card-header" id="headingOne">
+                <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne"
+                        aria-expanded="false" aria-controls="collapseOne">
+                        Weather variables
+                    </button>
+                </h5>
+            </div>
+
+            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                <div class="card-body">
+                    <div class="row">
+                        {% for key, value in sensor_descriptions.items() %}
+                        <div class="border col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                            <h4>{{ key }}</h4>
+                            {{ value }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header" id="headingOne">
+                <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo"
+                        aria-expanded="false" aria-controls="collapseTwo">
+                        Temperature variables
+                    </button>
+                </h5>
+            </div>
+
+            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                <div class="card-body">
+                    <div class="row">
+                        {% for key, value in temperature_descriptions.items() %}
+                        <div class="border col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
+                            <h4>{{ key }}</h4>
+                            {{ value }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header" id="headingOne">
+                <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree"
+                        aria-expanded="false" aria-controls="collapseThree">
+                        Soil moisture variables
+                    </button>
+                </h5>
+            </div>
+
+            <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                <div class="card-body">
+                    <div class="row">
+                        {% for key, value in soil_moisture_descriptions.items() %}
+
+                        <div class="border col-12 col-sm-12 col-md-6 col-lg-6 col-xl-4">
+                            <h4>{{ key }}</h4>
+                            {{ value }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

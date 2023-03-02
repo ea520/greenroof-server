@@ -1,0 +1,276 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+<!-- e.g. soil/weather/temperature -->
+<meta id="sensor_type" data-sensortype="{{ sensor_type }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+    integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/js/tempusdominus-bootstrap-4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.0/chartjs-plugin-zoom.min.js"></script>
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-adapter-moment/1.0.1/chartjs-adapter-moment.min.js"></script>
+<link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.39.0/css/tempusdominus-bootstrap-4.min.css"
+    integrity="sha512-3JRrEUwaCkFUBLK1N8HehwQgu8e23jTH4np5NHOmQOobuC4ROQxFwFgBLTnhcnQRMs84muMh0PnnwXlPq5MGjg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+{% endblock %}
+
+{% block content %}
+<span class="pull-left">
+    <div class="container-fluid">
+        <h1>{{ title }}</h1>
+        <div class="row">
+            <div class="col-12">
+                <div class="checkbox">
+                    <input type="checkbox" id="all_checked" value="all_checked" name="all_checkbox">
+                    <p style="font-size: small; display: inline;">All</p>
+                </div>
+                <div class="form-row">
+                    {% for sensor in sensors %}
+                    <div class="col-6 col-sm-6 col-md-4 col-lg-4 col-xl-3">
+
+                        <div class="checkbox">
+                            <input type="checkbox" value="{{ sensor.value }}" name="sensor_checkbox"
+                                onclick="select_all();" style="display: inline;">
+                            <p style="font-size: small; display: inline;">{{ sensor.text}}</p>
+                        </div>
+
+                    </div>
+                    {% endfor %}
+                </div>
+                <br>
+
+                <form>
+                    <div class="form-row">
+                        <div class="col-4 col-sm-3 col-md-2 col-lg-2 col-xl-1">
+                            <select class="form-control" id="start-or-end" style="font-size: small;">
+                                <option value="end">End date</option>
+                                <option value="start">Start date</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-sm-4 col-md-3 col-lg-2 col-xl-2">
+                            <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                                <input type="text" class="form-control datetimepicker-input"
+                                    data-target="#datetimepicker1" style="font-size: small;" />
+                                <div class="input-group-append" data-target="#datetimepicker1"
+                                    data-toggle="datetimepicker">
+                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-4 col-sm-3 col-md-2 col-lg-2 col-xl-1 form-group">
+                            <label for="time-days" style="font-size: small;">Days</label>
+                            <input id="time-days" type="number" class="form-control" value="7" style="font-size: small;"
+                                min="0">
+                        </div>
+                        <div class="col-4 col-sm-3 col-md-2 col-lg-2 col-xl-1 form-group">
+                            <label for="time-hours" style="font-size: small;">Hours</label>
+                            <input id="time-hours" type="number" class="form-control" value="0"
+                                style="font-size: small;" min="0" max="59">
+                        </div>
+                        <div class="col-4  col-sm-3 col-md-2 col-lg-2 col-xl-1 form-group">
+                            <label for="time-minutes" style="font-size: small;">Mins</label>
+                            <input id="time-minutes" type="number" class="form-control" value="0"
+                                style="font-size: small;" min="0" max="59">
+                        </div>
+                    </div>
+                    <!-- Buttons for exporting the data -->
+                    <div class="form-row">
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                            <button style="margin-left: 10px;" type="button" class="btn btn-light"
+                                onclick="get_data();">Plot</button>
+                            <button style="margin-left: 10px;" type="button" class="btn btn-light"
+                                onclick="export_data();">Export</button>
+                        </div>
+                    </div>
+                </form>
+
+
+            </div>
+
+            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                <div class="chart-container" style="height: min(calc(100vh - 56px), 80vw);">
+                    <canvas id="myChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</span>
+<script type="text/javascript">
+    const sensor_type = $('#sensor_type').data("sensortype");
+    const backend_port = "";
+    const base_url = "{{ prefix }}"; // this string will be replaced by a variable set in the python programme
+    function set_date() {
+        const url = base_url + "/API/latest/" + sensor_type;
+        fetch(url).then((response) => response.json())
+            .then((data) => {
+                const text = data["timestamp"];
+                $('#datetimepicker1').datetimepicker("date", moment(text));
+            })
+    }
+    set_date();
+    const ctx = document.getElementById('myChart')
+    var chart = new Chart(ctx, {});
+    function get_data() {
+        var sensors = new Array();
+        $("input:checkbox[name=sensor_checkbox]:checked").each(function () {
+            sensors.push($(this).val());
+        });
+        const timestamp = $('#datetimepicker1').datetimepicker("date");
+        const days = document.getElementById("time-days").value;
+        const hours = document.getElementById("time-hours").value;
+        const minutes = document.getElementById("time-minutes").value;
+        const seconds = 60 * minutes + 60 * 60 * hours + 60 * 60 * 24 * days;
+        const which_time = document.getElementById("start-or-end").value + "_time";
+        const max_ticks_limit = 5;
+
+
+        var url = base_url + "/API/JSON/" + sensor_type + "?" + new URLSearchParams(
+            {
+                [which_time]: timestamp.toISOString(),
+                "duration": seconds,
+                "cnt": ctx.clientWidth,
+            }
+        );
+        sensors.forEach(element => {
+            url += "&" + new URLSearchParams({ "q": element })
+        });
+
+        fetch(url)
+            .then((response) => response.json())
+            .then(
+                (data) => {
+                    datasets = [];
+                    const timestamps = data["timestamps"].map(function (e) { return moment(e); });
+                    const timerange = (Math.max(...timestamps) - Math.min(...timestamps)) * 1e-3; // seconds
+                    Object.keys(data["measurements"]).forEach(key => {
+                        data["measurements"][key];
+                        datasets.push({
+                            data: data["measurements"][key],
+                            label: key,
+                            pointRadius: 0,
+                            borderWidth: 1
+                        });
+                    });
+                    chart.destroy();
+                    chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            datasets: datasets,
+                            labels: timestamps,
+                        },
+                        options: {
+                            scales: {
+                                x: {
+                                    type: 'timeseries',
+                                    ticks: {
+                                        maxTicksLimit: max_ticks_limit,
+                                        callback: function (value, index, ticks) {
+                                            const days = 24 * 60 * 60;
+                                            var format = "";
+                                            if (timerange <= 1 * days)
+                                                format = "HH:mm";
+                                            else if (timerange < 2 * max_ticks_limit * days)
+                                                format = "Do MMM (HH:mm)";
+                                            else if (timerange < 366 * days)
+                                                format = "Do MMM"
+                                            else
+                                                format = "YYYY-MM-DD"
+
+                                            return moment(value).format(format);
+                                        }
+                                    }
+                                }
+                            },
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                decimation: {
+                                    enabled: true,
+                                },
+                                zoom: {
+                                    pan: {
+                                        enabled: true,
+                                        mode: 'x',
+                                    },
+                                    zoom: {
+                                        wheel: {
+                                            enabled: true,
+                                            modifierKey: "ctrl"
+                                        },
+                                        pinch: {
+                                            enabled: true
+                                        },
+                                        mode: 'x',
+                                    },
+                                    limits: {
+                                        x: { min: 'original', max: 'original' },
+                                    },
+                                }
+                            }
+                        }
+                    });
+                }
+            );
+
+
+
+    }
+    function select_all() {
+
+        var all_checked = false;
+        console.log(all_checked);
+        checkboxes = document.getElementsByName('sensor_checkbox');
+        for (var i = 0, n = checkboxes.length; i < n; i++) {
+            document.getElementById("all_checked").checked &= checkboxes[i].checked;
+            if (!document.getElementById("all_checked").checked)
+                break;
+        }
+    }
+
+    function export_data() {
+        const timestamp = $('#datetimepicker1').datetimepicker("date");
+        const days = document.getElementById("time-days").value;
+        const hours = document.getElementById("time-hours").value;
+        const minutes = document.getElementById("time-minutes").value;
+
+        const seconds = 60 * minutes + 60 * 60 * hours + 60 * 60 * 24 * days;
+        console.log(seconds);
+        const which_time = document.getElementById("start-or-end").value + "_time"
+        var url = base_url + "/API/CSV/" + sensor_type + "?" + new URLSearchParams(
+            {
+                [which_time]: timestamp.toISOString(),
+                "duration": seconds,
+            }
+        );
+        $("input:checkbox[name=sensor_checkbox]:checked").each(function () {
+            var sensor_name = $(this).val();
+            url += "&" + new URLSearchParams({ "q": sensor_name });
+        });
+        window.open(url, '_blank');
+    }
+    $(function () {
+        $('#datetimepicker1').datetimepicker({ format: "DD/MM/YYYY HH:mm" });
+    });
+    $(document).ready(function () {
+        $('#all_checked').change(function () {
+            if (this.checked == true) {
+                checkboxes = document.getElementsByName('sensor_checkbox');
+                for (var i = 0, n = checkboxes.length; i < n; i++) {
+                    checkboxes[i].checked = true;
+                }
+            }
+        }
+        )
+    });
+</script>
+
+{% endblock %}
