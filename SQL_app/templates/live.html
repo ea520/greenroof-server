@@ -101,7 +101,8 @@
                             break;
                     }
                 }
-
+                if(latest_value === undefined)
+                    latest_value = "---"
                 document.getElementById("par-" + chart_id).innerText = "(" + latest_value + (unit ? " " + unit : "") + ")";
 
                 charts[chart_id].update();
