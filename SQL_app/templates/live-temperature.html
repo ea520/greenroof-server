@@ -79,7 +79,10 @@
             fetch(url + queries)
                 .then((response) => response.json())
                 .then((data) => {
-                    charts[index].data.labels = data.timestamps;
+                    let timestamps = [];
+                    for (let i = 0; i < data.timestamps.length; i++)
+                        timestamps.push(moment.utc(data.timestamps[i]));
+                    charts[index].data.labels = timestamps;
                     let keys = Object.keys(data.measurements);
                     charts[index].data.datasets = [];
                     keys.forEach(element => {

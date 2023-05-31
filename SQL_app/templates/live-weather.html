@@ -320,18 +320,22 @@
             .then((data) => {
                 // console.log(data.measurements.average_temp);
                 // console.log(data.measurements.pressure);
-                update_hourly_data(rain_chart, data.timestamps, data.measurements.rain);
-                update_hourly_data(temp_chart, data.timestamps, data.measurements.average_temp);
-                update_hourly_data(humidity_chart, data.timestamps, data.measurements.average_humidity);
-                update_hourly_data(pressure_chart, data.timestamps, data.measurements.pressure);
-                update_hourly_data(wind_speed_chart, data.timestamps, data.measurements.wind_speed);
+                // console.log(data);
+                let timestamps = [];
+                for (let i = 0; i < data.timestamps.length; i++)
+                    timestamps.push(moment.utc(data.timestamps[i]));
+                update_hourly_data(rain_chart, timestamps, data.measurements.rain);
+                update_hourly_data(temp_chart, timestamps, data.measurements.average_temp);
+                update_hourly_data(humidity_chart, timestamps, data.measurements.average_humidity);
+                update_hourly_data(pressure_chart, timestamps, data.measurements.pressure);
+                update_hourly_data(wind_speed_chart, timestamps, data.measurements.wind_speed);
             });
         return;
     }
     function plot_daily_data() {
         const base_url = "{{ prefix }}";
         let end_time = moment().startOf("day").toISOString();
-        let start_time = moment().startOf("day").subtract(6, "days").add(61, "minutes").toISOString();
+        let start_time = moment().utc().startOf("day").subtract(6, "days").toISOString();
         // console.log(start_time);
 
         const day = 60 * 60 * 24;
@@ -347,9 +351,12 @@
             .then((data) => {
                 // console.log(url);
                 // console.log(data);
-                update_daily_minima_maxima(temp_chart, data.timestamps, data.measurements.min_temp, data.measurements.max_temp);
-                update_daily_minima_maxima(humidity_chart, data.timestamps, data.measurements.min_humidity, data.measurements.max_humidity);
-                update_daily_totals(rain_chart, data.timestamps, data.measurements.rain);
+                let timestamps = [];
+                for (let i = 0; i < data.timestamps.length; i++)
+                    timestamps.push(moment.utc(data.timestamps[i]));
+                update_daily_minima_maxima(temp_chart, timestamps, data.measurements.min_temp, data.measurements.max_temp);
+                update_daily_minima_maxima(humidity_chart, timestamps, data.measurements.min_humidity, data.measurements.max_humidity);
+                update_daily_totals(rain_chart, timestamps, data.measurements.rain);
             });
         return;
     }

@@ -65,12 +65,12 @@
     }
     function update_charts() {
         const base_url = "{{ prefix }}";
-        let this_morning = moment().startOf("day").subtract(1, "seconds").toISOString();
+        let this_morning = moment().subtract(1, "day").toISOString();
         const day = 60 * 60 * 24;
         var url = base_url + "/API/raw/JSON/moisture/" + "?" + new URLSearchParams(
             {
-                end_time: this_morning,
-                "duration": day - 1, // 1 week minus 1 second
+                start_time: this_morning,
+                // "duration": day - 1, // 1 week minus 1 second
             }
         );
         // console.log(url);
@@ -84,7 +84,11 @@
             fetch(url + queries)
                 .then((response) => response.json())
                 .then((data) => {
-                    charts[index].data.labels = data.timestamps;
+                    // console.log(data);
+                    let timestamps = [];
+                    for (let i = 0; i < data.timestamps.length; i++)
+                        timestamps.push(moment.utc(data.timestamps[i]));
+                    charts[index].data.labels = timestamps;
                     let keys = Object.keys(data.measurements);
                     charts[index].data.datasets = [];
                     keys.forEach(element => {
