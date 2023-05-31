@@ -1,5 +1,5 @@
 weather_sensor_descriptions={
-    "Power": "The voltage of the data logger. If the power is low (far below 11V), readings at those times may be incorrect.",
+    "Data logger power": "The voltage of the data logger. If the power is low (far below 11V), readings at those times may be incorrect.",
     "Pressure": "The air pressure (hPa)",
     "Rain": "The intensity of rainfall (mm since last reading)",
     "Sunshine": 'Whether the sun is shining (takes values "sun" and "no sun")',
@@ -33,6 +33,6 @@ temperature_sensor_descriptions={
 }
 
 soil_moisture_descriptions={
-    "Power 1, Power 2": f"The voltage of the datalogger. Logger 1 records the water levels 1-10. Logger 2 records water levels 11-20",
+    "Data logger power 1, Data logger power 2": f"The voltage of the datalogger. Logger 1 records the water levels 1-10. Logger 2 records water levels 11-20",
     "Soil moisture xx": "The soil moisture on the roof at location xx as a percentage. This is ratio of the volume of water in the soil to the total voume of the soil."
 }

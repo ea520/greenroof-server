@@ -5,7 +5,7 @@ from .database import Base
 import datetime
 from enum import Enum
 from sqlalchemy.dialects.postgresql import insert
-
+from typing import List
 # Create an enum of all of the required sensor data for a row in the data table
 # This includes the pressure etc. but not timestamp
 
@@ -38,7 +38,7 @@ TemperatureSensor = Enum(
 sensor_units = {
     WeatherSensor.power: "V",
     WeatherSensor.pressure: "hPa",
-    WeatherSensor.rain: "mm/5mins",
+    WeatherSensor.rain: "mm",
     WeatherSensor.sunshine: "",
     WeatherSensor.wind_dir: "deg",
     WeatherSensor.wind_speed: "m s" + chr(0x207B) + chr(0x00B9),
@@ -105,10 +105,9 @@ sensor_units = {
 def get_data(
     db: Session,
     _type: Base,
-    sensors: Enum,
+    sensors: List[Enum],
     start_time: datetime.datetime,
     end_time: datetime.datetime,
-    cnt: int,
 ):
     ret = (
         db.query(_type)
@@ -123,12 +122,6 @@ def get_data(
     ret = dict()
     ret["timestamps"] = dates
     ret["measurements"] = measurements
-    if cnt is not None:
-        num_measurements = len(dates)
-        skip = num_measurements//cnt + 1
-        ret["timestamps"] = ret["timestamps"][::skip]
-        for key in ret["measurements"]:
-            ret["measurements"][key] = ret["measurements"][key][::skip]
     return ret
 
 

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+
+
+<meta id="sensor_type" data-sensortype="{{ sensor_type }}">
+<meta id="chart_info" data-chart_info="{{ chart_info }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.0/chartjs-plugin-zoom.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.2.1/chartjs-plugin-annotation.min.js"
+    integrity="sha512-qF3T5CaMgSRNrxzu69V3ZrYGnrbRMIqrkE+OrE01DDsYDNo8R1VrtYL8pk+fqhKxUBXQ2z+yV/irk+AbbHtBAg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-adapter-moment/1.0.1/chartjs-adapter-moment.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<span class="pull-left">
+    <div class="container">
+        <h1>{{ title }}</h1>
+
+        <div class="row">
+            {% for i in range(1, 4+1) %}
+            <div class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                <h4>Chart {{ i }}</h4>
+                <p id="par-{{ i }}" style="display: inline;"></p>
+                <div class="chart-container" style="position: relative; margin: 0 auto; height: 300px;">
+                    <canvas name="charts" id="chart-{{ i }}"></canvas>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</span>
+
+<script type="text/javascript">
+    const backend_port = 8000;
+    const base_url = "{{ prefix }}"; // this string will be replaced by a variable set in the python programme
+    const sensor_type = $('#sensor_type').data("sensortype");
+    let sensors = [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10], [11, 12, 13, 14, 15], [16, 17, 18, 19, 20]];
+
+    let charts = [];
+    for (let i = 0; i < 4; i++) {
+        const ctx = document.getElementById('chart-' + (i + 1));
+        let options = {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: []
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                scales: {
+                    x: {
+                        type: 'timeseries',
+                    },
+                }
+            }
+        };
+        charts.push(new Chart(ctx, options));
+    }
+    function update_charts() {
+        const base_url = "{{ prefix }}";
+        let this_morning = moment().startOf("day").subtract(1, "seconds").toISOString();
+        const day = 60 * 60 * 24;
+        var url = base_url + "/API/raw/JSON/moisture/" + "?" + new URLSearchParams(
+            {
+                end_time: this_morning,
+                "duration": day - 1, // 1 week minus 1 second
+            }
+        );
+        // console.log(url);
+        sensors.forEach((element, index) => {
+            queries = ("&q=soil_moisture_" + String(element[0]).padStart(2, '0')
+                + "&q=soil_moisture_" + String(element[1]).padStart(2, '0')
+                + "&q=soil_moisture_" + String(element[2]).padStart(2, '0')
+                + "&q=soil_moisture_" + String(element[3]).padStart(2, '0')
+                + "&q=soil_moisture_" + String(element[4]).padStart(2, '0')
+            )
+            fetch(url + queries)
+                .then((response) => response.json())
+                .then((data) => {
+                    charts[index].data.labels = data.timestamps;
+                    let keys = Object.keys(data.measurements);
+                    charts[index].data.datasets = [];
+                    keys.forEach(element => {
+                        charts[index].data.datasets.push({
+                            data: data.measurements[element],
+                            borderWidth: 1,
+                            pointRadius: 0,
+                            label: element
+                        });
+                    });
+                    charts[index].update("null");
+                });
+            return;
+        });
+    }
+    // init();
+    update_charts();
+    setInterval(update_charts, 1000 * 60 * 60);
+
+</script>
+{% endblock %}

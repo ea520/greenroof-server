@@ -33,7 +33,7 @@
                 </div>
                 <div class="form-row">
                     {% for sensor in sensors %}
-                    <div class="col-6 col-sm-6 col-md-4 col-lg-4 col-xl-3">
+                    <div class="col-5 col-sm-5 col-md-4 col-lg-4 col-xl-3">
 
                         <div class="checkbox">
                             <input type="checkbox" value="{{ sensor.value }}" name="sensor_checkbox"
@@ -84,12 +84,20 @@
                     </div>
                     <!-- Buttons for exporting the data -->
                     <div class="form-row">
+                        <div class="col-4 col-sm-3 col-md-2 col-lg-2 col-xl-1">
+                            <select class="form-control" id="rate" style="font-size: small;">
+                                <option value="raw">Raw</option>
+                                <option value="hourly">Hourly</option>
+                                <option value="daily">Daily</option>
+                            </select>
+                        </div>
                         <div class="btn-group" role="group" aria-label="Basic example">
                             <button style="margin-left: 10px;" type="button" class="btn btn-light"
-                                onclick="get_data();">Plot</button>
+                                onclick="plot_data();">Plot</button>
                             <button style="margin-left: 10px;" type="button" class="btn btn-light"
                                 onclick="export_data();">Export</button>
                         </div>
+
                     </div>
                 </form>
 
@@ -109,17 +117,16 @@
     const backend_port = "";
     const base_url = "{{ prefix }}"; // this string will be replaced by a variable set in the python programme
     function set_date() {
-        const url = base_url + "/API/latest/" + sensor_type;
+        const url = base_url + "/API/latest/JSON/" + sensor_type;
         fetch(url).then((response) => response.json())
             .then((data) => {
-                const text = data["timestamp"];
-                $('#datetimepicker1').datetimepicker("date", moment(text));
+                $('#datetimepicker1').datetimepicker("date", moment());
             })
     }
     set_date();
     const ctx = document.getElementById('myChart')
     var chart = new Chart(ctx, {});
-    function get_data() {
+    function plot_data() {
         var sensors = new Array();
         $("input:checkbox[name=sensor_checkbox]:checked").each(function () {
             sensors.push($(this).val());
@@ -131,13 +138,16 @@
         const seconds = 60 * minutes + 60 * 60 * hours + 60 * 60 * 24 * days;
         const which_time = document.getElementById("start-or-end").value + "_time";
         const max_ticks_limit = 5;
-
-
-        var url = base_url + "/API/JSON/" + sensor_type + "?" + new URLSearchParams(
+        // let rate = "raw";
+        // if (days >= 7)
+        //     rate = "hourly"
+        // if (days >= 30)
+        //     rate = "daily"
+        const rate = document.getElementById("rate").value;
+        var url = base_url + "/API/" + rate + "/JSON/" + sensor_type + "?" + new URLSearchParams(
             {
                 [which_time]: timestamp.toISOString(),
                 "duration": seconds,
-                "cnt": ctx.clientWidth,
             }
         );
         sensors.forEach(element => {
@@ -193,9 +203,6 @@
                             responsive: true,
                             maintainAspectRatio: false,
                             plugins: {
-                                decimation: {
-                                    enabled: true,
-                                },
                                 zoom: {
                                     pan: {
                                         enabled: true,
@@ -244,8 +251,9 @@
 
         const seconds = 60 * minutes + 60 * 60 * hours + 60 * 60 * 24 * days;
         console.log(seconds);
-        const which_time = document.getElementById("start-or-end").value + "_time"
-        var url = base_url + "/API/CSV/" + sensor_type + "?" + new URLSearchParams(
+        const which_time = document.getElementById("start-or-end").value + "_time";
+        const rate = document.getElementById("rate").value;
+        var url = base_url + "/API/" + rate + "/CSV/" + sensor_type + "?" + new URLSearchParams(
             {
                 [which_time]: timestamp.toISOString(),
                 "duration": seconds,

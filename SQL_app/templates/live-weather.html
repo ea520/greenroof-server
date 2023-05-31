@@ -1,0 +1,414 @@
+{% extends "base.html" %}
+{% block head %}
+{{ super() }}
+
+
+<meta id="sensor_type" data-sensortype="{{ sensor_type }}">
+<meta id="chart_info" data-chart_info="{{ chart_info }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.0/chartjs-plugin-zoom.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.2.1/chartjs-plugin-annotation.min.js"
+    integrity="sha512-qF3T5CaMgSRNrxzu69V3ZrYGnrbRMIqrkE+OrE01DDsYDNo8R1VrtYL8pk+fqhKxUBXQ2z+yV/irk+AbbHtBAg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script
+    src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-adapter-moment/1.0.1/chartjs-adapter-moment.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<span class="pull-left">
+    <div class="container">
+        <h1>{{ title }}</h1>
+        <div class="row">
+            <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+                <p id="h4-stamp"><br></p>
+                <table class="table">
+                    {% for measurement in ["Temperature", "Relative humidity", "Wind speed", "Pressure"] %}
+                    <tr>
+                        <td>{{ measurement }}</td>
+                        <td id="td-{{ measurement }}"></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            {% for sensor in ["Rain", "Temperature", "Relative humidity", "Wind speed", "Pressure"] %}
+            <div class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+                <h4>{{ sensor }}</h4>
+                <p id="par-{{ sensor }}" style="display: inline;"></p>
+                <div class="chart-container" style="position: relative; margin: 0 auto; height: 300px;">
+                    <canvas name="charts" id="chart-{{ sensor }}"></canvas>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</span>
+
+<script>
+    function make_bar_chart_min_max(chartid, y_units) {
+        const data = {
+            datasets: [{
+                type: 'line',
+                label: 'Hourly',
+                data: [],
+                xAxisID: 'hourly-x-axis',
+                yAxisID: 'y-axis',
+                borderWidth: 1,
+                pointRadius: 0
+            },
+            {
+                type: 'bar',
+                label: 'Daily Max',
+                data: [],
+                xAxisID: 'daily-x-axis',
+                yAxisID: 'y-axis',
+            },
+            {
+                type: 'bar',
+                label: 'Daily Min',
+                data: [],
+                xAxisID: 'daily-x-axis',
+                yAxisID: 'y-axis',
+            },
+            ]
+        };
+        let options = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                // x-Axis by their IDs
+                'hourly-x-axis': { // <-- v3.x now object "{", not array "[{" anymore
+                    type: 'timeseries',
+                    time: {
+                        unit: 'hour', // <-- set to 'day'
+                        displayFormats: {
+                            hour: 'HH:mm',
+                            day: 'DD/MM'
+                        },
+                        tooltipFormat: 'HH:mm DD/MM'
+                    },
+                    position: 'bottom',
+                    ticks: { display: false },
+                    grid: {
+                        display: false
+                    }
+                },
+                'daily-x-axis': {
+                    type: 'timeseries', // <-- try "time" and "timeseries" to see difference
+                    time: {
+                        unit: 'day', // <-- set to 'month'
+                        displayFormats: {
+                            hour: 'HH:mm',
+                            day: 'DD/MM'
+                        },
+                        tooltipFormat: 'DD/MM'
+                    },
+                    position: 'bottom',
+                    stacked: true,
+                    grid: {
+                        display: false
+                    }
+
+                },
+                // y-Axis by their IDs
+                'y-axis': {
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: y_units,
+                    },
+                },
+            }
+        };
+        const ctx = document.getElementById(chartid);
+        const config = {
+            type: 'bar',
+            data: data,
+            options: options
+        };
+        return new Chart(ctx, config);
+    }
+
+    function make_bar_chart_single(chartid, y_units_hour, y_units_day) {
+        const data = {
+            datasets: [{
+                type: 'line',
+                label: 'Hourly',
+                data: [],
+                xAxisID: 'hourly-x-axis',
+                yAxisID: 'hourly-y-axis',
+                borderWidth: 1,
+                pointRadius: 0
+            },
+            {
+                type: 'bar',
+                label: 'Daily Total',
+                data: [],
+                xAxisID: 'daily-x-axis',
+                yAxisID: 'daily-y-axis',
+            },
+            ]
+        };
+        let options = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                // x-Axis by their IDs
+                'hourly-x-axis': { // <-- v3.x now object "{", not array "[{" anymore
+                    type: 'timeseries',
+                    time: {
+                        unit: 'hour', // <-- set to 'day'
+                        displayFormats: {
+                            hour: 'HH:mm',
+                            day: 'DD/MM'
+                        },
+                        tooltipFormat: 'dddd, MMM DD, YYYY'
+                    },
+                    position: 'bottom',
+                    ticks: { display: false },
+                    grid: {
+                        display: false
+                    }
+                },
+                'daily-x-axis': {
+                    type: 'timeseries', // <-- try "time" and "timeseries" to see difference
+                    time: {
+                        unit: 'day', // <-- set to 'month'
+                        displayFormats: {
+                            hour: 'HH:mm',
+                            day: 'DD/MM'
+                        },
+                        tooltipFormat: 'DD/MM'
+                    },
+                    position: 'bottom',
+                    stacked: true,
+                    grid: {
+                        display: false
+                    }
+
+                },
+                // y-Axis by their IDs
+                'daily-y-axis': {
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: y_units_day,
+                    },
+                },
+                'hourly-y-axis': {
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: y_units_hour,
+                    },
+                    grid: {
+                        display: false
+                    }
+                },
+            }
+        };
+        const ctx = document.getElementById(chartid);
+        const config = {
+            type: 'bar',
+            data: data,
+            options: options
+        };
+        return new Chart(ctx, config);
+    }
+
+    function make_line_chart(chartid, y_units) {
+
+        const data = {
+            datasets: [{
+                type: 'line',
+                label: 'Hourly',
+                data: [],
+                xAxisID: 'hourly-x-axis',
+                yAxisID: "y-axis",
+                borderWidth: 1,
+                pointRadius: 0
+            }
+            ]
+        };
+        let options = {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                // x-Axis by their IDs
+                'hourly-x-axis': { // <-- v3.x now object "{", not array "[{" anymore
+                    type: 'timeseries',
+                    time: {
+                        unit: 'day', // <-- set to 'day'
+                        displayFormats: {
+                            hour: 'HH:mm',
+                            day: 'DD/MM'
+                        },
+                        tooltipFormat: 'HH:mm DD/MM'
+                    },
+                    position: 'bottom',
+                    // ticks: { display: false },
+                    grid: {
+                        display: false
+                    }
+                },
+                'y-axis': {
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: y_units,
+                    },
+                },
+
+            }
+        };
+        const ctx = document.getElementById(chartid);
+        const config = {
+            type: 'bar',
+            data: data,
+            options: options
+        };
+        return new Chart(ctx, config);
+    }
+
+    function update_hourly_data(chart, stamps, values) {
+        hourly = [];
+        for (let i = 0; i < stamps.length; i++)
+            hourly.push({ "x": stamps[i], "y": values[i] });
+        chart.data.datasets[0].data = hourly;
+        chart.update('none');
+    }
+    function update_daily_minima_maxima(chart, stamps, mins, maxs) {
+        minima = [];
+        maxima = [];
+        for (let i = 0; i < stamps.length; i++) {
+            maxima.push({ "x": stamps[i], "y": maxs[i] });
+            minima.push({ "x": stamps[i], "y": mins[i] });
+        }
+        today = moment(stamps[stamps.length - 1]).add(1, "days").toISOString();
+        maxima.push({ "x": today, "y": null });
+        minima.push({ "x": today, "y": null });
+        chart.data.datasets[1].data = maxima;
+        chart.data.datasets[2].data = minima;
+        chart.update('none');
+    }
+    function update_daily_totals(chart, stamps, totals) {
+        tots = [];
+        for (let i = 0; i < stamps.length; i++) {
+            tots.push({ "x": stamps[i], "y": totals[i] });
+        }
+        today = moment(stamps[stamps.length - 1]).add(1, "days").toISOString();
+        tots.push({ "x": today, "y": null });
+        chart.data.datasets[1].data = tots;
+        chart.update('none');
+    }
+
+
+    function plot_hourly_data() {
+        const base_url = "{{ prefix }}";
+        // let end_time = moment().startOf("day").subtract(1, "seconds").toISOString();
+        let start_time = moment().startOf("day").subtract(6, "days").toISOString();
+        const day = 60 * 60 * 24;
+        var url = base_url + "/API/hourly/JSON/weather/" + "?" + new URLSearchParams(
+            {
+                // end_time: end_time,
+                start_time: start_time, // 1 week minus 1 second
+            }
+        );
+        url += "&q=rain&q=average_temp&q=average_humidity&q=pressure&q=wind_speed";
+        fetch(url)
+            .then((response) => response.json())
+            .then((data) => {
+                // console.log(data.measurements.average_temp);
+                // console.log(data.measurements.pressure);
+                update_hourly_data(rain_chart, data.timestamps, data.measurements.rain);
+                update_hourly_data(temp_chart, data.timestamps, data.measurements.average_temp);
+                update_hourly_data(humidity_chart, data.timestamps, data.measurements.average_humidity);
+                update_hourly_data(pressure_chart, data.timestamps, data.measurements.pressure);
+                update_hourly_data(wind_speed_chart, data.timestamps, data.measurements.wind_speed);
+            });
+        return;
+    }
+    function plot_daily_data() {
+        const base_url = "{{ prefix }}";
+        let end_time = moment().startOf("day").toISOString();
+        let start_time = moment().startOf("day").subtract(6, "days").add(61, "minutes").toISOString();
+        // console.log(start_time);
+
+        const day = 60 * 60 * 24;
+        var url = base_url + "/API/daily/JSON/weather/" + "?" + new URLSearchParams(
+            {
+                end_time: end_time,
+                start_time: start_time, // 1 week minus 1 second
+            }
+        );
+        url += "&q=rain&q=max_temp&q=min_temp&q=min_humidity&q=max_humidity";
+        fetch(url)
+            .then((response) => response.json())
+            .then((data) => {
+                // console.log(url);
+                // console.log(data);
+                update_daily_minima_maxima(temp_chart, data.timestamps, data.measurements.min_temp, data.measurements.max_temp);
+                update_daily_minima_maxima(humidity_chart, data.timestamps, data.measurements.min_humidity, data.measurements.max_humidity);
+                update_daily_totals(rain_chart, data.timestamps, data.measurements.rain);
+            });
+        return;
+    }
+    function update_latest() {
+        const base_url = "{{ prefix }}";
+        const day = 60 * 60 * 24;
+        var url = base_url + "/API/latest/JSON/weather?q=average_temp&q=average_humidity&q=pressure&q=wind_speed";
+        fetch(url)
+            .then((response) => response.json())
+            .then((data) => {
+                let timestamp = moment.max(moment.utc(data.average_temp.timestamp), moment.utc(data.average_humidity.timestamp), moment.utc(data.wind_speed.timestamp), moment.utc(data.pressure.timestamp),);
+                let latest_time = moment.utc(timestamp);
+                let fmt = (moment(latest_time).startOf("day") == moment().startOf("day")) ? "LT" : "lll";
+                console.log(latest_time)
+                document.getElementById("h4-stamp").innerHTML = "Last updated: " + latest_time.local().format(fmt);
+                document.getElementById("td-Temperature").innerHTML = data.average_temp.value.toFixed(1) + " &#8451;";
+                document.getElementById("td-Relative humidity").innerText = data.average_humidity.value.toFixed(1) + "%";
+                document.getElementById("td-Wind speed").innerText = data.wind_speed.value.toFixed(1) + " m/s";
+                document.getElementById("td-Pressure").innerText = data.pressure.value.toFixed(1) + " bar";
+            });
+    }
+    // https://gist.github.com/farhad-taran/f487a07c16fd53ee08a12a90cdaea082
+    function runAtSpecificTimeOfDay(hour, minutes, func) {
+        const twentyFourHours = 86400000;
+        const now = new Date();
+        let eta_ms = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minutes, 0, 0).getTime() - now;
+        if (eta_ms < 0) {
+            eta_ms += twentyFourHours;
+        }
+        setTimeout(function () {
+            //run once
+            func();
+            // run every 24 hours from now on
+            setInterval(func, twentyFourHours);
+        }, eta_ms);
+    }
+
+</script>
+
+<script type="text/javascript">
+    const backend_port = 8000;
+    const base_url = "{{ prefix }}"; // this string will be replaced by a variable set in the python programme
+    const sensor_type = $('#sensor_type').data("sensortype");
+    charts = {};
+
+    let temp_chart = make_bar_chart_min_max("chart-Temperature", "deg C");
+    let humidity_chart = make_bar_chart_min_max("chart-Relative humidity", "%");
+    let pressure_chart = make_line_chart("chart-Pressure", "bar");
+    let wind_speed_chart = make_line_chart("chart-Wind speed", "m/s");
+    let rain_chart = make_bar_chart_single("chart-Rain", "mm/hr", "mm/day");
+
+
+    plot_hourly_data();
+    plot_daily_data();
+    update_latest();
+    setInterval(update_latest, 1000 * 60 * 1);
+    setInterval(plot_hourly_data, 1000 * 60 * 60);
+    setInterval(plot_daily_data, 1000 * 60 * 60);
+
+
+</script>
+{% endblock %}
