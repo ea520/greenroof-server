@@ -143,12 +143,6 @@ def read_item(request: Request):
                                                              "title": "Soil Moisture",
                                                              "prefix": ".."})
 
-
-@app.get('/favicon.ico', include_in_schema=False)
-def favicon():
-    return FileResponse("SQL_app/static/favicon.ico")
-
-
 # BACKEND
 
 
@@ -302,7 +296,9 @@ def get_latest_measurements(_type: models.Base, q: List[Enum], db: Session = Dep
     for el in inspect(_type).columns:
         if el.name in query_strings:
             val = db.query(_type.timestamp, el).order_by(
-                _type.timestamp.desc()).filter(el != None).first()
+                _type.timestamp.desc()).filter(el.isnot(None)).first()
+            if val is None:
+                open("foo.txt", "w").write(f"{val}, {el.key}")
             ret[el.key] = dict(timestamp=val[0], value=val[1])
     return _type(**ret)
 
@@ -405,7 +401,8 @@ def get_moisture_by_timestep(
     ret["timestamps"] = list(result[result.keys()[0]].keys())
     ret["measurements"] = dict()
     for key in result.keys():
-        ret["measurements"][key] = list(result[key].values)
+        ret["measurements"][key] = list(val if not pd.isna(
+            val) else None for val in result[key].values)
     return ret
 
 
@@ -438,7 +435,8 @@ def get_temperature_by_timestep(
     ret["timestamps"] = list(result[result.keys()[0]].keys())
     ret["measurements"] = dict()
     for key in result.keys():
-        ret["measurements"][key] = list(result[key].values)
+        ret["measurements"][key] = list(val if not pd.isna(
+            val) else None for val in result[key].values)
     return ret
 
 

@@ -45,7 +45,8 @@
 </span>
 
 <script>
-    function make_bar_chart_min_max(chartid, y_units) {
+    function make_bar_chart_min_max(chartid, y_units)
+    {
         const data = {
             datasets: [{
                 type: 'line',
@@ -129,7 +130,8 @@
         return new Chart(ctx, config);
     }
 
-    function make_bar_chart_single(chartid, y_units_hour, y_units_day) {
+    function make_bar_chart_single(chartid, y_units_hour, y_units_day)
+    {
         const data = {
             datasets: [{
                 type: 'line',
@@ -162,7 +164,7 @@
                             hour: 'HH:mm',
                             day: 'DD/MM'
                         },
-                        tooltipFormat: 'dddd, MMM DD, YYYY'
+                        tooltipFormat: 'HH:mm DD/MM'
                     },
                     position: 'bottom',
                     ticks: { display: false },
@@ -171,7 +173,7 @@
                     }
                 },
                 'daily-x-axis': {
-                    type: 'timeseries', // <-- try "time" and "timeseries" to see difference
+                    type: 'time', // <-- try "time" and "timeseries" to see difference
                     time: {
                         unit: 'day', // <-- set to 'month'
                         displayFormats: {
@@ -182,6 +184,7 @@
                     },
                     position: 'bottom',
                     stacked: true,
+                    ticks: { display: true },
                     grid: {
                         display: false
                     }
@@ -216,7 +219,8 @@
         return new Chart(ctx, config);
     }
 
-    function make_line_chart(chartid, y_units) {
+    function make_line_chart(chartid, y_units)
+    {
 
         const data = {
             datasets: [{
@@ -257,6 +261,7 @@
                         display: true,
                         text: y_units,
                     },
+                    beginAtZero: false,
                 },
 
             }
@@ -270,57 +275,61 @@
         return new Chart(ctx, config);
     }
 
-    function update_hourly_data(chart, stamps, values) {
+    function update_hourly_data(chart, stamps, values)
+    {
         hourly = [];
         for (let i = 0; i < stamps.length; i++)
             hourly.push({ "x": stamps[i], "y": values[i] });
         chart.data.datasets[0].data = hourly;
         chart.update('none');
     }
-    function update_daily_minima_maxima(chart, stamps, mins, maxs) {
+    function update_daily_minima_maxima(chart, stamps, mins, maxs)
+    {
         minima = [];
         maxima = [];
-        for (let i = 0; i < stamps.length; i++) {
+        for (let i = 0; i < stamps.length; i++)
+        {
             maxima.push({ "x": stamps[i], "y": maxs[i] });
             minima.push({ "x": stamps[i], "y": mins[i] });
         }
         today = moment(stamps[stamps.length - 1]).add(1, "days").toISOString();
-        maxima.push({ "x": today, "y": null });
-        minima.push({ "x": today, "y": null });
+        // maxima.push({ "x": today, "y": null });
+        // minima.push({ "x": today, "y": null });
         chart.data.datasets[1].data = maxima;
         chart.data.datasets[2].data = minima;
         chart.update('none');
     }
-    function update_daily_totals(chart, stamps, totals) {
+    function update_daily_totals(chart, stamps, totals)
+    {
         tots = [];
-        for (let i = 0; i < stamps.length; i++) {
+        for (let i = 0; i < stamps.length; i++)
+        {
             tots.push({ "x": stamps[i], "y": totals[i] });
         }
         today = moment(stamps[stamps.length - 1]).add(1, "days").toISOString();
-        tots.push({ "x": today, "y": null });
+        // tots.push({ "x": today, "y": null });
         chart.data.datasets[1].data = tots;
         chart.update('none');
     }
 
 
-    function plot_hourly_data() {
+    function plot_hourly_data()
+    {
         const base_url = "{{ prefix }}";
-        // let end_time = moment().startOf("day").subtract(1, "seconds").toISOString();
-        let start_time = moment().startOf("day").subtract(6, "days").toISOString();
+        let end_time = moment().utc().startOf("day").subtract(1, "seconds").toISOString();
+        let start_time = moment().utc().startOf("day").subtract(6, "days").toISOString();
         const day = 60 * 60 * 24;
         var url = base_url + "/API/hourly/JSON/weather/" + "?" + new URLSearchParams(
             {
-                // end_time: end_time,
+                end_time: end_time,
                 start_time: start_time, // 1 week minus 1 second
             }
         );
         url += "&q=rain&q=average_temp&q=average_humidity&q=pressure&q=wind_speed";
         fetch(url)
             .then((response) => response.json())
-            .then((data) => {
-                // console.log(data.measurements.average_temp);
-                // console.log(data.measurements.pressure);
-                // console.log(data);
+            .then((data) =>
+            {
                 let timestamps = [];
                 for (let i = 0; i < data.timestamps.length; i++)
                     timestamps.push(moment.utc(data.timestamps[i]));
@@ -332,11 +341,13 @@
             });
         return;
     }
-    function plot_daily_data() {
+    function plot_daily_data()
+    {
         const base_url = "{{ prefix }}";
-        let end_time = moment().startOf("day").toISOString();
+        let end_time = moment().utc().startOf("day").subtract(1, "seconds").toISOString();
+
+        // let end_time = moment().utc().startOf("day").toISOString();
         let start_time = moment().utc().startOf("day").subtract(6, "days").toISOString();
-        // console.log(start_time);
 
         const day = 60 * 60 * 24;
         var url = base_url + "/API/daily/JSON/weather/" + "?" + new URLSearchParams(
@@ -348,9 +359,8 @@
         url += "&q=rain&q=max_temp&q=min_temp&q=min_humidity&q=max_humidity";
         fetch(url)
             .then((response) => response.json())
-            .then((data) => {
-                // console.log(url);
-                // console.log(data);
+            .then((data) =>
+            {
                 let timestamps = [];
                 for (let i = 0; i < data.timestamps.length; i++)
                     timestamps.push(moment.utc(data.timestamps[i]));
@@ -360,33 +370,36 @@
             });
         return;
     }
-    function update_latest() {
+    function update_latest()
+    {
         const base_url = "{{ prefix }}";
-        const day = 60 * 60 * 24;
         var url = base_url + "/API/latest/JSON/weather?q=average_temp&q=average_humidity&q=pressure&q=wind_speed";
         fetch(url)
             .then((response) => response.json())
-            .then((data) => {
+            .then((data) =>
+            {
                 let timestamp = moment.max(moment.utc(data.average_temp.timestamp), moment.utc(data.average_humidity.timestamp), moment.utc(data.wind_speed.timestamp), moment.utc(data.pressure.timestamp),);
                 let latest_time = moment.utc(timestamp);
                 let fmt = (moment(latest_time).startOf("day") == moment().startOf("day")) ? "LT" : "lll";
-                console.log(latest_time)
                 document.getElementById("h4-stamp").innerHTML = "Last updated: " + latest_time.local().format(fmt);
                 document.getElementById("td-Temperature").innerHTML = data.average_temp.value.toFixed(1) + " &#8451;";
                 document.getElementById("td-Relative humidity").innerText = data.average_humidity.value.toFixed(1) + "%";
                 document.getElementById("td-Wind speed").innerText = data.wind_speed.value.toFixed(1) + " m/s";
-                document.getElementById("td-Pressure").innerText = data.pressure.value.toFixed(1) + " bar";
+                document.getElementById("td-Pressure").innerText = data.pressure.value.toFixed(1) + " hPa";
             });
     }
     // https://gist.github.com/farhad-taran/f487a07c16fd53ee08a12a90cdaea082
-    function runAtSpecificTimeOfDay(hour, minutes, func) {
+    function runAtSpecificTimeOfDay(hour, minutes, func)
+    {
         const twentyFourHours = 86400000;
         const now = new Date();
         let eta_ms = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minutes, 0, 0).getTime() - now;
-        if (eta_ms < 0) {
+        if (eta_ms < 0)
+        {
             eta_ms += twentyFourHours;
         }
-        setTimeout(function () {
+        setTimeout(function ()
+        {
             //run once
             func();
             // run every 24 hours from now on
@@ -404,7 +417,7 @@
 
     let temp_chart = make_bar_chart_min_max("chart-Temperature", "deg C");
     let humidity_chart = make_bar_chart_min_max("chart-Relative humidity", "%");
-    let pressure_chart = make_line_chart("chart-Pressure", "bar");
+    let pressure_chart = make_line_chart("chart-Pressure", "hPa");
     let wind_speed_chart = make_line_chart("chart-Wind speed", "m/s");
     let rain_chart = make_bar_chart_single("chart-Rain", "mm/hr", "mm/day");
 

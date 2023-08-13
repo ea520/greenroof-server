@@ -1,6 +1,6 @@
 import math
 from sqlalchemy.orm import Session, load_only, deferred
-from . import models, schemas
+from . import models
 from .database import Base
 import datetime
 from enum import Enum
@@ -9,29 +9,30 @@ from typing import List
 # Create an enum of all of the required sensor data for a row in the data table
 # This includes the pressure etc. but not timestamp
 
+# list(c.name for c in models.Weather.__table__.columns)
 WeatherSensor = Enum(
     "WeatherSensor",
     (
-        (name, name)
-        for name in schemas.WeatherCreate.__fields__.keys()
-        if name != "timestamp"
+        (c.name, c.name)
+        for c in models.Weather.__table__.columns
+        if c.name != "timestamp"
     ),
 )
 MoistureSensor = Enum(
     "MoistureSensor",
     (
-        (name, name)
-        for name in schemas.SoilMoistureCreate.__fields__.keys()
-        if name != "timestamp"
+        (c.name, c.name)
+        for c in models.SoilMoisture.__table__.columns
+        if c.name != "timestamp"
     ),
 )
 
 TemperatureSensor = Enum(
     "TemperatureSensor",
     (
-        (name, name)
-        for name in schemas.TemperatureCreate.__fields__.keys()
-        if name != "timestamp"
+        (c.name, c.name)
+        for c in models.Temperature.__table__.columns
+        if c.name != "timestamp"
     ),
 )
 
@@ -123,26 +124,3 @@ def get_data(
     ret["timestamps"] = dates
     ret["measurements"] = measurements
     return ret
-
-
-base_model_to_base = {
-    schemas.WeatherCreate: models.Weather,
-    schemas.SoilMoistureCreate: models.SoilMoisture,
-    schemas.TemperatureCreate: models.Temperature,
-}
-
-
-def create_data(db: Session, data: schemas.BaseModel):
-    base = base_model_to_base.get(type(data))
-    old_data = db.query(base).filter(base.timestamp == data.timestamp).first()
-    if (old_data is None):
-        old_data = base(timestamp=data.timestamp)
-    new_data = data.dict()
-    for key in new_data:
-        if (isinstance(new_data[key], float) and not math.isnan(new_data[key])):
-            setattr(old_data, key, new_data[key])
-        elif (isinstance(new_data[key], str)):
-            setattr(old_data, key, new_data[key])
-
-    db.merge(old_data)
-    return db

@@ -3,13 +3,19 @@ from SQL_app.models import Temperature
 from SQL_app.database import SessionLocal, engine
 import datetime
 import logging
+import logging.handlers
 import glob
 import os
 import parse
 import math
 import re
-logging.basicConfig(filename='/home/ea520/greenroof-server/logs/update_database.log',
+base = os.path.dirname(os.path.abspath(__file__))
+logfile = base + "/logs/update_database.log"
+logging.basicConfig(filename=logfile,
                     format='%(asctime)s %(message)s', level=logging.INFO)
+handler = logging.handlers.RotatingFileHandler(logfile, mode='a', maxBytes=1 * 1024 * 1024,
+                                               backupCount=5, encoding=None, delay=False)
+logger = logging.getLogger().addHandler(handler)
 Base.metadata.create_all(bind=engine)
 db = SessionLocal()
 
@@ -49,7 +55,7 @@ weather_files = glob.glob(
 latest_date = f"{stamp.year}{stamp.month:02}{stamp.day:02}"
 reamining_files = [
     file for file in weather_files if os.path.basename(file) > "tempdata_" + latest_date]
-
+reamining_files = sorted(reamining_files)
 for file in reamining_files:
     lines = [line.strip("\n") for line in open(file).readlines()[2:]]
     parsed_lines = [compiled_format.parse(line) for line in lines]
@@ -60,5 +66,6 @@ for file in reamining_files:
     db.add_all(to_insert)
     if len(to_insert):
         logging.log(logging.INFO,
-                    f"Temperature updated with stamp {to_insert[-1].timestamp}")
+                    f"Updated {len(to_insert)} temperatures with latest stamp {to_insert[-1].timestamp}")
+
     db.commit()

@@ -4,6 +4,7 @@
 .venv
 *.log
 *.out
+/logs
 /database/moisture/*
 /database/weather/*
 *.pickle
