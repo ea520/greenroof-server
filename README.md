@@ -150,7 +150,7 @@ The water level sensors are located on the schematic that comes with this file.
 GP2-SMC-05 in the diagram corresponds to soil_moisture_05.
 
 ### The temperature sensors
-|Website/API name|ID in text files|Name on diagram|
+|Website/API name|ID in text files|Name on [diagram](Layout-of-green-roof-sensors.pdf)|
 |-|-|-|
 |temperature_01|28-041750b045ff|RF-TMP-01 a?|
 |temperature_02|28-0417500f45ff|-|
